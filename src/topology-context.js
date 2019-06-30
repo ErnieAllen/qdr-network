@@ -1,0 +1,109 @@
+import React from "react";
+import {
+  Form,
+  FormGroup,
+  TextInput,
+  ActionGroup,
+  Button
+} from "@patternfly/react-core";
+
+class TopologyContext extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      context: "interior"
+    };
+    this.contexts = {
+      interior: {
+        title: "Interior router",
+        fields: [{ name: "" }, { route_suffix: "" }, { namespace: "" }],
+        actions: [{ Delete: this.handleDeleteRouter }]
+      },
+      edgeClass: {
+        title: "Edge class",
+        fields: [{ name: "" }],
+        actions: [{ Delete: this.handleDeleteEdgeClass }]
+      },
+      edge: {
+        title: "Edge router",
+        fields: [{ name: "" }],
+        actions: [{ Delete: this.handleDeleteEdge }]
+      },
+      connection: {
+        title: "Connection",
+        fields: [],
+        actions: [
+          { Delete: this.handleDeleteConnection },
+          { Reverse: this.handleReverseConnections }
+        ]
+      }
+    };
+    this.handleTextInputChange1 = value1 => {
+      this.setState({ value1 });
+    };
+    this.handleTextInputChange2 = value2 => {
+      this.setState({ value2 });
+    };
+    this.handleTextInputChange3 = value3 => {
+      this.setState({ value3 });
+    };
+  }
+
+  handleDeleteRouter = () => {
+    console.log("deleting router");
+  };
+  handleDeleteEdgeClass = () => {};
+  handleDeleteEdge = () => {};
+  handleDeleteConnection = () => {};
+  handleReverseConnection = () => {};
+  handleTextInputChange = () => {};
+
+  render() {
+    const { context } = this.state;
+    const currentContext = this.contexts[context];
+
+    return (
+      <Form className="context-form">
+        <h1>{currentContext.title}</h1>
+        {currentContext.fields.map(field => {
+          const fieldName = Object.keys(field)[0];
+          return (
+            <FormGroup
+              key={fieldName}
+              label={fieldName}
+              isRequired
+              fieldId={fieldName}
+              helperText=""
+            >
+              <TextInput
+                isRequired
+                type="text"
+                id={fieldName}
+                name={fieldName}
+                aria-describedby="simple-form-name-helper"
+                value={currentContext.fields[fieldName]}
+                onChange={() => this.handleTextInputChange()}
+              />
+            </FormGroup>
+          );
+        })}
+        <ActionGroup>
+          {currentContext.actions.map(action => {
+            const actionName = Object.keys(action)[0];
+            return (
+              <Button
+                key={actionName}
+                variant="secondary"
+                onClick={action[actionName]}
+              >
+                {actionName}
+              </Button>
+            );
+          })}
+        </ActionGroup>
+      </Form>
+    );
+  }
+}
+
+export default TopologyContext;
