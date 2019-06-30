@@ -123,6 +123,10 @@ class Graph extends React.Component {
       .classed("edgeClass", d => d.type === "edgeClass")
       .classed("edge", d => d.type === "edge")
       .classed("interior", d => d.type === "interior");
+
+    d3.selectAll("svg text").each(function(d) {
+      d3.select(this).text(d.name);
+    });
   };
 
   updateNode = selection => {

@@ -10,13 +10,12 @@ import {
 class TopologyContext extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      context: "interior"
-    };
+    this.state = {};
+
     this.contexts = {
       interior: {
         title: "Interior router",
-        fields: [{ name: "" }, { route_suffix: "" }, { namespace: "" }],
+        fields: [{ name: "" }, { suffix: "" }, { namespace: "" }],
         actions: [{ Delete: this.handleDeleteRouter }]
       },
       edgeClass: {
@@ -56,7 +55,9 @@ class TopologyContext extends React.Component {
   handleDeleteEdge = () => {};
   handleDeleteConnection = () => {};
   handleReverseConnection = () => {};
-  handleTextInputChange = () => {};
+  handleTextInputChange = (newVal, fieldName, key) => {
+    this.props.handleEditField(newVal, fieldName, key);
+  };
 
   render() {
     let currentContext = null;
@@ -93,8 +94,14 @@ class TopologyContext extends React.Component {
                 id={fieldName}
                 name={fieldName}
                 aria-describedby="simple-form-name-helper"
-                value={currentContext.fields[fieldName]}
-                onChange={() => this.handleTextInputChange()}
+                value={currentNode[fieldName]}
+                onChange={newVal =>
+                  this.handleTextInputChange(
+                    newVal,
+                    fieldName,
+                    currentNode.name
+                  )
+                }
               />
             </FormGroup>
           );

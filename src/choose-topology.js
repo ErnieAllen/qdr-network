@@ -63,6 +63,19 @@ class ChooseTopology extends React.Component {
     this.setState({ networkInfo });
   };
 
+  handleEditField = (newVal, fieldName, key) => {
+    const { networkInfo } = this.state;
+    let { selectedNode } = this.state;
+    const currentNode = networkInfo.nodes.find(n => n.name === key);
+    if (currentNode) {
+      currentNode[fieldName] = newVal;
+      if (fieldName === "name") {
+        selectedNode = newVal;
+      }
+      this.setState({ networkInfo, selectedNode });
+    }
+  };
+
   updateNodesLinks = networkInfo => {
     const { nodes, links } = this.nodesLinks.setNodesLinks(
       networkInfo,
@@ -154,6 +167,7 @@ class ChooseTopology extends React.Component {
               <TopologyContext
                 selectedNode={this.state.selectedNode}
                 networkInfo={this.state.networkInfo}
+                handleEditField={this.handleEditField}
               />
             </SplitItem>
           </Split>
