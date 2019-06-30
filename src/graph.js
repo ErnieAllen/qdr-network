@@ -78,24 +78,9 @@ class Graph extends React.Component {
   enterNode = selection => {
     const graph = this;
 
-    selection.classed("node", true).classed("client", n => !isNaN(n.parent));
+    selection.append("circle").attr("r", d => d.r);
 
-    selection
-      .filter(d => isNaN(d.parent))
-      .append("circle")
-      .attr("r", d => d.size);
-
-    selection
-      .filter(d => d.type === "senders")
-      .append("polygon")
-      .attr("points", "0 -5 5 0 0 5")
-      .attr("transform", "scale(2)");
-
-    selection
-      .filter(d => d.type === "receivers")
-      .append("polygon")
-      .attr("points", "0 -5 5 0 0 5")
-      .attr("transform", "scale(2) rotate(180)");
+    selection.classed("node", true);
 
     if (!this.props.thumbNail) {
       selection
@@ -127,11 +112,17 @@ class Graph extends React.Component {
       .on("mouseup", n => {
         n.fixed = true;
       });
+
+    this.refresh();
   };
 
   refresh = () => {
     const circles = d3.selectAll("g.node");
-    circles.classed("selected", d => d.key === this.selected);
+    circles
+      .classed("selected", d => d.key === this.selected)
+      .classed("edgeClass", d => d.type === "edgeClass")
+      .classed("edge", d => d.type === "edge")
+      .classed("interior", d => d.type === "interior");
   };
 
   updateNode = selection => {

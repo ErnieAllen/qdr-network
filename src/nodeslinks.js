@@ -54,7 +54,12 @@ class NodesLinks {
     const y = dimensions.height / 2;
     const newNode = this.node(i, x, y);
     newNode.type = type;
-    newNode.name = `${type === "interior" ? "R" : "E"}${i}`;
+    if (type === "interior") newNode.name = `R${i}`;
+    else if (type === "edge") newNode.name = `E${i}`;
+    else if (type === "edgeClass") {
+      newNode.name = `EC${i}`;
+      newNode.r = 60;
+    }
     networkInfo.nodes.push(newNode);
   };
 

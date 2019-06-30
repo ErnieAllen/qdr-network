@@ -51,6 +51,12 @@ class ChooseTopology extends React.Component {
     this.setState({ networkInfo });
   };
 
+  handleAddEdgeClass = () => {
+    const { networkInfo, dimensions } = this.state;
+    this.nodesLinks.addNode("edgeClass", networkInfo, dimensions);
+    this.setState({ networkInfo });
+  };
+
   handleAddEdge = () => {
     const { networkInfo, dimensions } = this.state;
     this.nodesLinks.addNode("edge", networkInfo, dimensions);
@@ -110,7 +116,11 @@ class ChooseTopology extends React.Component {
                 </Button>
               </ToolbarItem>
               <ToolbarItem className="pf-u-mx-md">
-                <Button aria-label="add edge class" variant="tertiary">
+                <Button
+                  aria-label="add edge class"
+                  variant="tertiary"
+                  onClick={this.handleAddEdgeClass}
+                >
                   Add Edge class
                 </Button>
               </ToolbarItem>

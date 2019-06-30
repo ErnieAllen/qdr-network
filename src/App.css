@@ -91,6 +91,10 @@
   stroke-width: 2px;
 }
 
+.node.edgeClass circle {
+  stroke-dasharray: 10;
+}
+
 .node.selected circle {
   stroke-width: 4px;
   stroke: green;
