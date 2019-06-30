@@ -10,7 +10,6 @@ class Graph extends React.Component {
     this.state = {
       isOpen: false
     };
-    this.selected = null;
     this.force = d3.layout
       .force()
       .size([this.props.dimensions.width, this.props.dimensions.height])
@@ -100,12 +99,10 @@ class Graph extends React.Component {
         graph.updateNode(d3.select(this));
       })
       .on("click", n => {
-        if (graph.selected === n.key) {
-          graph.selected = null;
+        if (this.props.selectedKey === n.key) {
           this.props.notifyCurrentRouter(null);
         } else {
-          graph.selected = n.key;
-          this.props.notifyCurrentRouter(n.name);
+          this.props.notifyCurrentRouter(n.key);
         }
         graph.refresh();
       })
@@ -119,7 +116,7 @@ class Graph extends React.Component {
   refresh = () => {
     const circles = d3.selectAll("g.node");
     circles
-      .classed("selected", d => d.key === this.selected)
+      .classed("selected", d => d.key === this.props.selectedKey)
       .classed("edgeClass", d => d.type === "edgeClass")
       .classed("edge", d => d.type === "edge")
       .classed("interior", d => d.type === "interior");

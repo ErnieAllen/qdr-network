@@ -62,7 +62,7 @@ class TopologyContext extends React.Component {
   render() {
     let currentContext = null;
     const currentNode = this.props.networkInfo.nodes.find(
-      n => n.name === this.props.selectedNode
+      n => n.key === this.props.selectedKey
     );
     if (currentNode) {
       currentContext = this.contexts[currentNode.type];
@@ -96,11 +96,7 @@ class TopologyContext extends React.Component {
                 aria-describedby="simple-form-name-helper"
                 value={currentNode[fieldName]}
                 onChange={newVal =>
-                  this.handleTextInputChange(
-                    newVal,
-                    fieldName,
-                    currentNode.name
-                  )
+                  this.handleTextInputChange(newVal, fieldName, currentNode.key)
                 }
               />
             </FormGroup>

@@ -25,7 +25,7 @@ class ChooseTopology extends React.Component {
     this.state = {
       networkInfo: { name: "network name", nodes: [], links: [] },
       dimensions: null,
-      selectedNode: null
+      selectedKey: null
     };
     this.nodesLinks = new NodesLinks();
   }
@@ -65,14 +65,10 @@ class ChooseTopology extends React.Component {
 
   handleEditField = (newVal, fieldName, key) => {
     const { networkInfo } = this.state;
-    let { selectedNode } = this.state;
-    const currentNode = networkInfo.nodes.find(n => n.name === key);
+    const currentNode = networkInfo.nodes.find(n => n.key === key);
     if (currentNode) {
       currentNode[fieldName] = newVal;
-      if (fieldName === "name") {
-        selectedNode = newVal;
-      }
-      this.setState({ networkInfo, selectedNode });
+      this.setState({ networkInfo });
     }
   };
 
@@ -97,8 +93,8 @@ class ChooseTopology extends React.Component {
     });
   };
 
-  notifyCurrentRouter = selectedNode => {
-    this.setState({ selectedNode });
+  notifyCurrentRouter = selectedKey => {
+    this.setState({ selectedKey });
   };
 
   render() {
@@ -159,13 +155,14 @@ class ChooseTopology extends React.Component {
                     links={this.state.networkInfo.links}
                     dimensions={this.state.dimensions}
                     notifyCurrentRouter={this.notifyCurrentRouter}
+                    selectedKey={this.state.selectedKey}
                   />
                 )}
               </div>
             </SplitItem>
             <SplitItem className="context-form">
               <TopologyContext
-                selectedNode={this.state.selectedNode}
+                selectedKey={this.state.selectedKey}
                 networkInfo={this.state.networkInfo}
                 handleEditField={this.handleEditField}
               />
