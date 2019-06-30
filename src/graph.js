@@ -10,7 +10,7 @@ class Graph extends React.Component {
     this.state = {
       isOpen: false
     };
-
+    this.selected = null;
     this.force = d3.layout
       .force()
       .size([this.props.dimensions.width, this.props.dimensions.height])

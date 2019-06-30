@@ -47,6 +47,17 @@ class NodesLinks {
       nodes.push(this.node(i, x, y));
     }
   };
+
+  addNode = (type, networkInfo, dimensions) => {
+    const i = networkInfo.nodes.length;
+    const x = dimensions.width / 2;
+    const y = dimensions.height / 2;
+    const newNode = this.node(i, x, y);
+    newNode.type = type;
+    newNode.name = `${type === "interior" ? "R" : "E"}${i}`;
+    networkInfo.nodes.push(newNode);
+  };
+
   setNodesLinks = (networkInfo, dimensions) => {
     const nodes = [];
     let links = [];
@@ -55,20 +66,21 @@ class NodesLinks {
     const displace = dimensions.height / 2;
     // create the routers
     // set their starting positions in a circle
-    if (networkInfo.routers === 1) {
+    if (networkInfo.routers.length === 1) {
       nodes.push(this.node(0, midX, midY));
     } else {
       this.addNodesInCircle(
         nodes,
         0,
-        networkInfo.routers,
+        networkInfo.routers.length,
         midX,
         midY,
         displace
       );
     }
-    if (networkInfo.routers > 1) links = this.setLinks(0, networkInfo.routers);
-    return { nodes: nodes, links: links };
+    if (networkInfo.routers.length > 1)
+      links = this.setLinks(0, networkInfo.routers.length);
+    return { nodes, links };
   };
 }
 

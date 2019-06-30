@@ -59,9 +59,21 @@ class TopologyContext extends React.Component {
   handleTextInputChange = () => {};
 
   render() {
-    const { context } = this.state;
-    const currentContext = this.contexts[context];
+    let currentContext = null;
+    const currentNode = this.props.networkInfo.nodes.find(
+      n => n.name === this.props.selectedNode
+    );
+    if (currentNode) {
+      currentContext = this.contexts[currentNode.type];
+    }
 
+    if (!currentContext) {
+      return (
+        <div>
+          <h1>Nothing selected</h1>
+        </div>
+      );
+    }
     return (
       <Form className="context-form">
         <h1>{currentContext.title}</h1>

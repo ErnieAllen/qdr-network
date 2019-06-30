@@ -190,6 +190,7 @@ path.cloud-outline {
 
 .context-form {
   text-align: left;
-  min-width: 36em;
+  min-width: 34em;
   margin-left: 2em;
+  margin-right: 2em;
 }

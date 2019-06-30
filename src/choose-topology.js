@@ -23,8 +23,9 @@ class ChooseTopology extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      networkInfo: { routers: 0, name: "network name", nodes: [], links: [] },
-      dimensions: null
+      networkInfo: { name: "network name", nodes: [], links: [] },
+      dimensions: null,
+      selectedNode: null
     };
     this.nodesLinks = new NodesLinks();
   }
@@ -45,9 +46,14 @@ class ChooseTopology extends React.Component {
   };
 
   handleAddInterior = () => {
-    const { networkInfo } = this.state;
-    networkInfo.routers++;
-    this.updateNodesLinks(networkInfo);
+    const { networkInfo, dimensions } = this.state;
+    this.nodesLinks.addNode("interior", networkInfo, dimensions);
+    this.setState({ networkInfo });
+  };
+
+  handleAddEdge = () => {
+    const { networkInfo, dimensions } = this.state;
+    this.nodesLinks.addNode("edge", networkInfo, dimensions);
     this.setState({ networkInfo });
   };
 
@@ -58,7 +64,6 @@ class ChooseTopology extends React.Component {
     );
     networkInfo.nodes = nodes;
     networkInfo.links = links;
-    console.log(`changing routers to ${networkInfo.routers}`);
   };
 
   onToggle = isOpen => {
@@ -71,6 +76,10 @@ class ChooseTopology extends React.Component {
     this.setState({
       isOpen: !this.state.isOpen
     });
+  };
+
+  notifyCurrentRouter = selectedNode => {
+    this.setState({ selectedNode });
   };
 
   render() {
@@ -109,7 +118,7 @@ class ChooseTopology extends React.Component {
                 <Button
                   aria-label="add edge router"
                   variant="tertiary"
-                  onClick={this.onSelect}
+                  onClick={this.handleAddEdge}
                 >
                   Add Edge router
                 </Button>
@@ -126,13 +135,16 @@ class ChooseTopology extends React.Component {
                     nodes={this.state.networkInfo.nodes}
                     links={this.state.networkInfo.links}
                     dimensions={this.state.dimensions}
-                    notifyCurrentRouter={() => {}}
+                    notifyCurrentRouter={this.notifyCurrentRouter}
                   />
                 )}
               </div>
             </SplitItem>
-            <SplitItem>
-              <TopologyContext />
+            <SplitItem className="context-form">
+              <TopologyContext
+                selectedNode={this.state.selectedNode}
+                networkInfo={this.state.networkInfo}
+              />
             </SplitItem>
           </Split>
         </PageSection>
