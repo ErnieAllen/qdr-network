@@ -40,7 +40,7 @@ class NetworkName extends React.Component {
       <React.Fragment>
         <Split gutter="md" className="network-name">
           <SplitItem>
-            <TextContent>
+            <TextContent className="enter-prompt">
               <Text component="h3">Enter a network name to get started</Text>
             </TextContent>
           </SplitItem>

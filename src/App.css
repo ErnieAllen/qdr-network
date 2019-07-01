@@ -91,10 +91,6 @@
   stroke-width: 2px;
 }
 
-.node.edgeClass circle {
-  stroke-dasharray: 10;
-}
-
 .node.selected circle {
   stroke-width: 4px;
   stroke: green;
@@ -117,9 +113,11 @@
   fill: white;
 }
 
-.node.client polygon {
+.node.edgeClass polygon {
   stroke: black;
-  fill: white;
+  fill: none;
+  stroke-width: 0.02;
+  stroke-dasharray: 0.2;
 }
 
 .tag-line {
@@ -194,7 +192,12 @@ path.cloud-outline {
 
 .context-form {
   text-align: left;
-  min-width: 34em;
-  margin-left: 2em;
-  margin-right: 2em;
+    min-width: 34em;
+    padding-left: 2em;
+    margin-right: 0;
+    border-left: 1px solid lightgray;
+}
+
+.enter-prompt {
+  padding-top: 0.25em;
 }

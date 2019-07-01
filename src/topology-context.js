@@ -16,17 +16,20 @@ class TopologyContext extends React.Component {
       interior: {
         title: "Interior router",
         fields: [{ name: "" }, { suffix: "" }, { namespace: "" }],
-        actions: [{ Delete: this.handleDeleteRouter }]
+        actions: [{ Delete: this.props.handleDeleteRouter }]
       },
       edgeClass: {
         title: "Edge class",
         fields: [{ name: "" }],
-        actions: [{ Delete: this.handleDeleteEdgeClass }]
+        actions: [
+          { Delete: this.props.handleDeleteRouter },
+          { "Add edge router": this.props.handleAddEdge }
+        ]
       },
       edge: {
         title: "Edge router",
         fields: [{ name: "" }],
-        actions: [{ Delete: this.handleDeleteEdge }]
+        actions: [{ Delete: this.props.handleDeleteRouter }]
       },
       connection: {
         title: "Connection",
@@ -48,16 +51,10 @@ class TopologyContext extends React.Component {
     };
   }
 
-  handleDeleteRouter = () => {
-    console.log("deleting router");
-  };
   handleDeleteEdgeClass = () => {};
   handleDeleteEdge = () => {};
   handleDeleteConnection = () => {};
   handleReverseConnection = () => {};
-  handleTextInputChange = (newVal, fieldName, key) => {
-    this.props.handleEditField(newVal, fieldName, key);
-  };
 
   render() {
     let currentContext = null;
@@ -76,7 +73,7 @@ class TopologyContext extends React.Component {
       );
     }
     return (
-      <Form className="context-form">
+      <Form>
         <h1>{currentContext.title}</h1>
         {currentContext.fields.map(field => {
           const fieldName = Object.keys(field)[0];
@@ -96,7 +93,7 @@ class TopologyContext extends React.Component {
                 aria-describedby="simple-form-name-helper"
                 value={currentNode[fieldName]}
                 onChange={newVal =>
-                  this.handleTextInputChange(newVal, fieldName, currentNode.key)
+                  this.props.handleEditField(newVal, fieldName, currentNode.key)
                 }
               />
             </FormGroup>

@@ -46,20 +46,20 @@ class ChooseTopology extends React.Component {
   };
 
   handleAddInterior = () => {
-    const { networkInfo, dimensions } = this.state;
-    this.nodesLinks.addNode("interior", networkInfo, dimensions);
+    const { networkInfo, dimensions, selectedKey } = this.state;
+    this.nodesLinks.addNode("interior", networkInfo, dimensions, selectedKey);
     this.setState({ networkInfo });
   };
 
   handleAddEdgeClass = () => {
-    const { networkInfo, dimensions } = this.state;
-    this.nodesLinks.addNode("edgeClass", networkInfo, dimensions);
+    const { networkInfo, dimensions, selectedKey } = this.state;
+    this.nodesLinks.addNode("edgeClass", networkInfo, dimensions, selectedKey);
     this.setState({ networkInfo });
   };
 
   handleAddEdge = () => {
-    const { networkInfo, dimensions } = this.state;
-    this.nodesLinks.addNode("edge", networkInfo, dimensions);
+    const { networkInfo, dimensions, selectedKey } = this.state;
+    this.nodesLinks.addNode("edge", networkInfo, dimensions, selectedKey);
     this.setState({ networkInfo });
   };
 
@@ -69,6 +69,27 @@ class ChooseTopology extends React.Component {
     if (currentNode) {
       currentNode[fieldName] = newVal;
       this.setState({ networkInfo });
+    }
+  };
+
+  handleDeleteRouter = () => {
+    const { networkInfo } = this.state;
+    let { selectedKey } = this.state;
+    const nodeIndex = networkInfo.nodes.findIndex(n => n.key === selectedKey);
+    if (nodeIndex >= 0) {
+      // remove all links
+      let linkIndex = this.nodesLinks.linkIndex(networkInfo.links, nodeIndex);
+      while (linkIndex >= 0) {
+        networkInfo.links.splice(linkIndex, 1);
+        linkIndex = this.nodesLinks.linkIndex(networkInfo.links, nodeIndex);
+      }
+      // if this routers was selected, unselect it
+      if (networkInfo.nodes[nodeIndex].key === selectedKey) {
+        selectedKey = null;
+      }
+      // remove the router
+      networkInfo.nodes.splice(nodeIndex, 1);
+      this.setState({ networkInfo, selectedKey });
     }
   };
 
@@ -95,6 +116,21 @@ class ChooseTopology extends React.Component {
 
   notifyCurrentRouter = selectedKey => {
     this.setState({ selectedKey });
+  };
+
+  notifyCreateLink = (to, from) => {
+    const { networkInfo } = this.state;
+    const toIndex = networkInfo.nodes.findIndex(n => n.key === to);
+    const fromIndex = networkInfo.nodes.findIndex(n => n.key === from);
+    if (toIndex >= 0 && fromIndex >= 0) {
+      if (
+        networkInfo.nodes[toIndex].type === "interior" &&
+        networkInfo.nodes[fromIndex].type !== "edge"
+      ) {
+        this.nodesLinks.addLink(fromIndex, toIndex, networkInfo.links);
+        this.setState({ networkInfo });
+      }
+    }
   };
 
   render() {
@@ -133,15 +169,6 @@ class ChooseTopology extends React.Component {
                   Add Edge class
                 </Button>
               </ToolbarItem>
-              <ToolbarItem className="pf-u-mx-md">
-                <Button
-                  aria-label="add edge router"
-                  variant="tertiary"
-                  onClick={this.handleAddEdge}
-                >
-                  Add Edge router
-                </Button>
-              </ToolbarItem>
             </ToolbarGroup>
           </Toolbar>
         </PageSection>
@@ -155,6 +182,7 @@ class ChooseTopology extends React.Component {
                     links={this.state.networkInfo.links}
                     dimensions={this.state.dimensions}
                     notifyCurrentRouter={this.notifyCurrentRouter}
+                    notifyCreateLink={this.notifyCreateLink}
                     selectedKey={this.state.selectedKey}
                   />
                 )}
@@ -165,6 +193,8 @@ class ChooseTopology extends React.Component {
                 selectedKey={this.state.selectedKey}
                 networkInfo={this.state.networkInfo}
                 handleEditField={this.handleEditField}
+                handleDeleteRouter={this.handleDeleteRouter}
+                handleAddEdge={this.handleAddEdge}
               />
             </SplitItem>
           </Split>

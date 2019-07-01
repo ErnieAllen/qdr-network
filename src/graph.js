@@ -7,18 +7,21 @@ class Graph extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      isOpen: false
-    };
+    this.state = {};
     this.force = d3.layout
       .force()
       .size([this.props.dimensions.width, this.props.dimensions.height])
-      .linkDistance(l =>
-        this.props.thumbNail ? 50 : l.type === "router" ? 150 : 50
-      )
+      .linkDistance(l => {
+        if (this.props.thumbNail) return 50;
+        else if (l.type === "router") return 150;
+        else if (l.type === "edge") return 20;
+        return 50;
+      })
       .charge(-800)
       .friction(0.1)
       .gravity(0.001);
+
+    this.mouse_down_position = null;
   }
 
   // called only once when the component is initialized
@@ -43,7 +46,7 @@ class Graph extends React.Component {
   shouldComponentUpdate(nextProps) {
     this.d3Graph = d3.select(this.svgg);
 
-    var d3Nodes = this.d3Graph
+    const d3Nodes = this.d3Graph
       .selectAll(".node")
       .data(nextProps.nodes, node => node.key);
     d3Nodes
@@ -54,7 +57,7 @@ class Graph extends React.Component {
     d3Nodes.call(this.updateNode);
     d3Nodes.call(this.force.drag);
 
-    var d3Links = this.d3Graph
+    const d3Links = this.d3Graph
       .selectAll(".link")
       .data(nextProps.links, link => link.key);
     d3Links
@@ -89,6 +92,14 @@ class Graph extends React.Component {
         .text(d => d.name);
     }
 
+    const sqr2o2 = Math.sqrt(2.0) / 2.0;
+    const points = `1 0 ${sqr2o2} ${sqr2o2} 0 1 -${sqr2o2} ${sqr2o2} -1 0 -${sqr2o2} -${sqr2o2} 0 -1 ${sqr2o2} -${sqr2o2}`;
+    selection
+      .filter(d => d.type === "edgeClass")
+      .append("polygon")
+      .attr("points", points)
+      .attr("transform", `scale(60) rotate(22.5)`);
+
     selection
       .on("mouseover", function(n) {
         n.over = true;
@@ -98,21 +109,41 @@ class Graph extends React.Component {
         n.over = false;
         graph.updateNode(d3.select(this));
       })
-      .on("click", n => {
-        if (this.props.selectedKey === n.key) {
-          this.props.notifyCurrentRouter(null);
+      .on("click", function(n) {
+        // if there was a selected node and it was not the one we just clicked on:
+        // create a link between the selected node and the clicked on node
+        if (graph.props.selectedKey && graph.props.selectedKey !== n.key) {
+          graph.props.notifyCreateLink(n.key, graph.props.selectedKey);
+        }
+
+        // see if the node was dragged (same === false)
+        const same = graph.samePos(
+          d3.mouse(this.parentNode),
+          graph.mouse_down_position
+        );
+        if (graph.props.selectedKey === n.key && same) {
+          graph.props.notifyCurrentRouter(null);
         } else {
-          this.props.notifyCurrentRouter(n.key);
+          graph.props.notifyCurrentRouter(n.key);
         }
         graph.refresh();
       })
+      .on("mousedown", function(n) {
+        graph.mouse_down_position = d3.mouse(this.parentNode);
+      })
       .on("mouseup", n => {
-        n.fixed = true;
+        if (n.type !== "edge") n.fixed = true;
       });
 
     this.refresh();
   };
 
+  samePos = (pos1, pos2) => {
+    if (pos1 && pos2) {
+      if (pos1[0] === pos2[0] && pos1[1] === pos2[1]) return true;
+    }
+    return false;
+  };
   refresh = () => {
     const circles = d3.selectAll("g.node");
     circles
