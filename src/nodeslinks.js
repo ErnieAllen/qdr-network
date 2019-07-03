@@ -1,6 +1,7 @@
 class NodesLinks {
   static nextNodeIndex = 0;
   static nextLinkIndex = 0;
+  static nextEdgeIndex = 0;
   link = (s, t, i) => ({
     source: s,
     target: t,
@@ -60,33 +61,12 @@ class NodesLinks {
       newNode.name = `R${i}`;
       newNode.suffix = "";
       newNode.namespace = "";
-    } else if (type === "edge") {
-      const source = networkInfo.nodes.find(n => n.key === selectedKey);
-      if (source) {
-        newNode.x = source.x;
-        newNode.y = source.y;
-      }
-      newNode.name = `E${i}`;
-      newNode.r = 10;
     } else if (type === "edgeClass") {
       newNode.name = `EC${i}`;
+      newNode.rows = [];
       newNode.r = 6;
     }
     networkInfo.nodes.push(newNode);
-
-    // if we added an edge, connect it to the selected edgeClass
-    if (type === "edge") {
-      const source = networkInfo.nodes.findIndex(n => n.key === selectedKey);
-      if (source >= 0) {
-        const link = this.link(
-          source,
-          networkInfo.nodes.length - 1,
-          NodesLinks.nextLinkIndex++
-        );
-        link.type = "edge";
-        networkInfo.links.push(link);
-      }
-    }
   };
 
   addLink = (toIndex, fromIndex, links) => {
@@ -94,6 +74,10 @@ class NodesLinks {
       const link = this.link(fromIndex, toIndex, NodesLinks.nextLinkIndex++);
       links.push(link);
     }
+  };
+
+  getEdgeName = () => {
+    return `Edge-${NodesLinks.nextEdgeIndex++}`;
   };
 
   // return true if there are any links between toIndex and fromIndex

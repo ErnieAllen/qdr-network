@@ -201,3 +201,8 @@ path.cloud-outline {
 .enter-prompt {
   padding-top: 0.25em;
 }
+
+.edge-table-actions {
+  position: absolute;
+  right: 1em;
+}

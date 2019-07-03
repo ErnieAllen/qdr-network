@@ -79,8 +79,9 @@ class Graph extends React.Component {
 
   enterNode = selection => {
     const graph = this;
-
-    selection.append("circle").attr("r", d => d.r);
+    selection.append("circle").attr("r", d => {
+      return d.r ? d.r : d.size;
+    });
 
     selection.classed("node", true);
 
@@ -178,6 +179,8 @@ class Graph extends React.Component {
         return d.right ? `url(#end--20)` : null;
       })
       .attr("marker-start", d => {
+        if (d.type === "edge") return null;
+        if (this.props.thumbNail) return null;
         return d.left || (!d.left && !d.right) ? `url(#start--20)` : null;
       });
   };

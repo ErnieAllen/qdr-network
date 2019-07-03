@@ -34,7 +34,7 @@ const nodeProperties = {
     radius: 20,
     refX: {
       end: 24,
-      start: -12
+      start: -14
     },
     linkDistance: [110, 55],
     charge: [-1350, -900]

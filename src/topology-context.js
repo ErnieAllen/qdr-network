@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Form,
-  FormGroup,
-  TextInput,
-  ActionGroup,
-  Button
-} from "@patternfly/react-core";
+import FieldDetails from "./field-details";
 
 class TopologyContext extends React.Component {
   constructor(props) {
@@ -14,40 +8,48 @@ class TopologyContext extends React.Component {
 
     this.contexts = {
       interior: {
-        title: "Interior router",
-        fields: [{ name: "" }, { suffix: "" }, { namespace: "" }],
-        actions: [{ Delete: this.props.handleDeleteRouter }]
+        title: "Interior connector",
+        fields: [
+          { title: "Identity", type: "text", isRequired: true },
+          { title: "Route-suffix", type: "text" },
+          { title: "Namespace", type: "text" },
+          {
+            title: "Cluster type",
+            type: "radio",
+            options: ["Kube", "okd", "OC 3.11", "OC 4.1", "unknown"]
+          },
+          {
+            title: "State",
+            type: "checkbox",
+            options: [
+              "New",
+              "Ready to deploy",
+              "Cluster heard from",
+              "In network"
+            ]
+          }
+        ],
+        actions: [{ title: "Delete", onClick: this.props.handleDeleteRouter }]
       },
       edgeClass: {
         title: "Edge class",
-        fields: [{ name: "" }],
-        actions: [
-          { Delete: this.props.handleDeleteRouter },
-          { "Add edge router": this.props.handleAddEdge }
-        ]
+        fields: [{ title: "name", type: "text", isRequired: true }],
+        actions: [{ title: "Delete", onClick: this.props.handleDeleteRouter }],
+        extra: { title: "Edge connectors", type: "edgeTable" }
       },
       edge: {
-        title: "Edge router",
-        fields: [{ name: "" }],
-        actions: [{ Delete: this.props.handleDeleteRouter }]
+        title: "Edge connector",
+        fields: [{ title: "name", type: "text", isRequired: true }],
+        actions: [{ title: "Delete", onClick: this.props.handleDeleteRouter }]
       },
       connection: {
         title: "Connection",
         fields: [],
         actions: [
-          { Delete: this.handleDeleteConnection },
-          { Reverse: this.handleReverseConnections }
+          { title: "Delete", onClick: this.handleDeleteConnection },
+          { title: "Reverse", onClick: this.handleReverseConnections }
         ]
       }
-    };
-    this.handleTextInputChange1 = value1 => {
-      this.setState({ value1 });
-    };
-    this.handleTextInputChange2 = value2 => {
-      this.setState({ value2 });
-    };
-    this.handleTextInputChange3 = value3 => {
-      this.setState({ value3 });
     };
   }
 
@@ -73,47 +75,16 @@ class TopologyContext extends React.Component {
       );
     }
     return (
-      <Form>
-        <h1>{currentContext.title}</h1>
-        {currentContext.fields.map(field => {
-          const fieldName = Object.keys(field)[0];
-          return (
-            <FormGroup
-              key={fieldName}
-              label={fieldName}
-              isRequired
-              fieldId={fieldName}
-              helperText=""
-            >
-              <TextInput
-                isRequired
-                type="text"
-                id={fieldName}
-                name={fieldName}
-                aria-describedby="simple-form-name-helper"
-                value={currentNode[fieldName]}
-                onChange={newVal =>
-                  this.props.handleEditField(newVal, fieldName, currentNode.key)
-                }
-              />
-            </FormGroup>
-          );
-        })}
-        <ActionGroup>
-          {currentContext.actions.map(action => {
-            const actionName = Object.keys(action)[0];
-            return (
-              <Button
-                key={actionName}
-                variant="secondary"
-                onClick={action[actionName]}
-              >
-                {actionName}
-              </Button>
-            );
-          })}
-        </ActionGroup>
-      </Form>
+      <FieldDetails
+        details={currentContext}
+        networkInfo={this.props.networkInfo}
+        selectedKey={this.props.selectedKey}
+        handleEditField={this.props.handleEditField}
+        handleAddEdge={this.props.handleAddEdge}
+        handleDeleteEdge={this.props.handleDeleteEdge}
+        handleEdgeNameChange={this.props.handleEdgeNameChange}
+        handleSelectEdgeRow={this.props.handleSelectEdgeRow}
+      />
     );
   }
 }

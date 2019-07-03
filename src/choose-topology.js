@@ -23,7 +23,11 @@ class ChooseTopology extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      networkInfo: { name: "network name", nodes: [], links: [] },
+      networkInfo: {
+        name: "network name",
+        nodes: [],
+        links: []
+      },
       dimensions: null,
       selectedKey: null
     };
@@ -58,8 +62,49 @@ class ChooseTopology extends React.Component {
   };
 
   handleAddEdge = () => {
-    const { networkInfo, dimensions, selectedKey } = this.state;
-    this.nodesLinks.addNode("edge", networkInfo, dimensions, selectedKey);
+    const { networkInfo, selectedKey } = this.state;
+    const currentNode = networkInfo.nodes.find(n => n.key === selectedKey);
+    if (currentNode && currentNode.type === "edgeClass") {
+      currentNode.rows.push({
+        cells: [this.nodesLinks.getEdgeName()],
+        selected: false
+      });
+    }
+    this.setState({ networkInfo });
+  };
+
+  handleDeleteEdge = () => {
+    const { networkInfo, selectedKey } = this.state;
+    const currentNode = networkInfo.nodes.find(n => n.key === selectedKey);
+    if (currentNode && currentNode.type === "edgeClass") {
+      currentNode.rows = currentNode.rows.filter(r => !r.selected);
+    }
+    this.setState({ networkInfo });
+  };
+
+  handleEdgeNameChange = (value, rowIndex) => {
+    const { networkInfo, selectedKey } = this.state;
+    const currentNode = networkInfo.nodes.find(n => n.key === selectedKey);
+    if (currentNode && currentNode.type === "edgeClass") {
+      currentNode.rows[rowIndex].cells[0] = value;
+    }
+    this.setState({ networkInfo });
+  };
+
+  handleSelectEdgeRow = (rowId, isSelected) => {
+    const { networkInfo, selectedKey } = this.state;
+    const currentNode = networkInfo.nodes.find(n => n.key === selectedKey);
+    if (currentNode && currentNode.type === "edgeClass") {
+      // set all row's selected to isSelected
+      if (rowId === -1) {
+        currentNode.rows = currentNode.rows.map(r => ({
+          cells: r.cells,
+          selected: isSelected
+        }));
+      } else {
+        currentNode.rows[rowId].selected = isSelected;
+      }
+    }
     this.setState({ networkInfo });
   };
 
@@ -157,7 +202,7 @@ class ChooseTopology extends React.Component {
                   onClick={this.handleAddInterior}
                   variant="tertiary"
                 >
-                  Add Interior router
+                  Add Interior Connector
                 </Button>
               </ToolbarItem>
               <ToolbarItem className="pf-u-mx-md">
@@ -195,6 +240,9 @@ class ChooseTopology extends React.Component {
                 handleEditField={this.handleEditField}
                 handleDeleteRouter={this.handleDeleteRouter}
                 handleAddEdge={this.handleAddEdge}
+                handleDeleteEdge={this.handleDeleteEdge}
+                handleEdgeNameChange={this.handleEdgeNameChange}
+                handleSelectEdgeRow={this.handleSelectEdgeRow}
               />
             </SplitItem>
           </Split>
