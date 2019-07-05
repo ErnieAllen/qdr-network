@@ -19,6 +19,13 @@ under the License.
 
 import * as d3 from "d3";
 
+export const RouterStates = [
+  "NEW",
+  "READY TO DEPLOY",
+  "CLUSTER HEARD FROM",
+  "IN NETWORK"
+];
+
 const nodeProperties = {
   // router types
   "inter-router": {

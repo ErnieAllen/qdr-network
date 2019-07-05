@@ -59,6 +59,7 @@ class EdgeTableToolbar extends React.Component {
             type="search"
             onChange={this.handleTextInputChange}
             aria-label="search text input"
+            placeholder="search for edge routers"
           />
           <Button
             variant={ButtonVariant.tertiary}

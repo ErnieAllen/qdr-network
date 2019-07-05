@@ -1,5 +1,7 @@
 import React from "react";
 import FieldDetails from "./field-details";
+import { RouterStates } from "./nodes";
+import EmptySelection from "./empty-selection";
 
 class TopologyContext extends React.Component {
   constructor(props) {
@@ -8,9 +10,9 @@ class TopologyContext extends React.Component {
 
     this.contexts = {
       interior: {
-        title: "Interior connector",
+        title: "Cluster connector",
         fields: [
-          { title: "Identity", type: "text", isRequired: true },
+          { title: "Name", type: "text", isRequired: true },
           { title: "Route-suffix", type: "text" },
           { title: "Namespace", type: "text" },
           {
@@ -20,13 +22,8 @@ class TopologyContext extends React.Component {
           },
           {
             title: "State",
-            type: "checkbox",
-            options: [
-              "New",
-              "Ready to deploy",
-              "Cluster heard from",
-              "In network"
-            ]
+            type: "states",
+            options: RouterStates
           }
         ],
         actions: [{ title: "Delete", onClick: this.props.handleDeleteRouter }]
@@ -35,14 +32,14 @@ class TopologyContext extends React.Component {
         title: "Edge class",
         fields: [{ title: "name", type: "text", isRequired: true }],
         actions: [{ title: "Delete", onClick: this.props.handleDeleteRouter }],
-        extra: { title: "Edge connectors", type: "edgeTable" }
+        extra: { title: "Edge routers", type: "edgeTable" }
       },
       edge: {
-        title: "Edge connector",
+        title: "Edge router",
         fields: [{ title: "name", type: "text", isRequired: true }],
         actions: [{ title: "Delete", onClick: this.props.handleDeleteRouter }]
       },
-      connection: {
+      connector: {
         title: "Connection",
         fields: [],
         actions: [
@@ -65,12 +62,17 @@ class TopologyContext extends React.Component {
     );
     if (currentNode) {
       currentContext = this.contexts[currentNode.type];
+    } else {
+      const currentLink = this.props.networkInfo.links.find(
+        l => l.key === this.props.selectedKey
+      );
+      if (currentLink) currentContext = this.contexts[currentLink.type];
     }
 
     if (!currentContext) {
       return (
         <div>
-          <h1>Nothing selected</h1>
+          <EmptySelection />
         </div>
       );
     }
@@ -84,6 +86,7 @@ class TopologyContext extends React.Component {
         handleDeleteEdge={this.props.handleDeleteEdge}
         handleEdgeNameChange={this.props.handleEdgeNameChange}
         handleSelectEdgeRow={this.props.handleSelectEdgeRow}
+        handleRadioChange={this.props.handleRadioChange}
       />
     );
   }

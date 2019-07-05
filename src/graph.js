@@ -42,7 +42,6 @@ class Graph extends React.Component {
   }
 
   // called each time one of the properties changes
-  // in our case, the number of routers probably changed
   shouldComponentUpdate(nextProps) {
     this.d3Graph = d3.select(this.svgg);
 
@@ -62,7 +61,7 @@ class Graph extends React.Component {
       .data(nextProps.links, link => link.key);
     d3Links
       .enter()
-      .insert("line", ".node")
+      .insert("g", ".node")
       .call(this.enterLink);
     d3Links.exit().remove();
     d3Links.call(this.updateLink);
@@ -79,20 +78,38 @@ class Graph extends React.Component {
 
   enterNode = selection => {
     const graph = this;
+
     selection.append("circle").attr("r", d => {
       return d.r ? d.r : d.size;
     });
 
+    selection
+      .filter(d => d.type === "interior")
+      .append("path")
+      .attr("d", d =>
+        d3.svg
+          .arc()
+          .innerRadius(0)
+          .outerRadius(d.r)({
+          startAngle: 0,
+          endAngle: (d.state * 2.0 * Math.PI) / 3.0
+        })
+      );
+
     selection.classed("node", true);
 
+    if (!this.props.thumbNail || this.props.legend) {
+      selection.classed("network", true);
+    }
     if (!this.props.thumbNail) {
       selection
         .append("text")
-        .attr("x", d => d.size + 5)
+        .attr("x", d => d.r + 5)
         .attr("dy", ".35em")
         .text(d => d.name);
     }
 
+    /*
     const sqr2o2 = Math.sqrt(2.0) / 2.0;
     const points = `1 0 ${sqr2o2} ${sqr2o2} 0 1 -${sqr2o2} ${sqr2o2} -1 0 -${sqr2o2} -${sqr2o2} 0 -1 ${sqr2o2} -${sqr2o2}`;
     selection
@@ -100,17 +117,20 @@ class Graph extends React.Component {
       .append("polygon")
       .attr("points", points)
       .attr("transform", `scale(60) rotate(22.5)`);
-
+*/
     selection
       .on("mouseover", function(n) {
+        if (graph.props.thumbNail) return;
         n.over = true;
         graph.updateNode(d3.select(this));
       })
       .on("mouseout", function(n) {
+        if (graph.props.thumbNail) return;
         n.over = false;
         graph.updateNode(d3.select(this));
       })
       .on("click", function(n) {
+        if (graph.props.thumbNail) return;
         // if there was a selected node and it was not the one we just clicked on:
         // create a link between the selected node and the clicked on node
         if (graph.props.selectedKey && graph.props.selectedKey !== n.key) {
@@ -133,6 +153,7 @@ class Graph extends React.Component {
         graph.mouse_down_position = d3.mouse(this.parentNode);
       })
       .on("mouseup", n => {
+        if (graph.props.thumbNail) return;
         if (n.type !== "edge") n.fixed = true;
       });
 
@@ -146,7 +167,7 @@ class Graph extends React.Component {
     return false;
   };
   refresh = () => {
-    const circles = d3.selectAll("g.node");
+    const circles = d3.selectAll("g.node.network");
     circles
       .classed("selected", d => d.key === this.props.selectedKey)
       .classed("edgeClass", d => d.type === "edgeClass")
@@ -156,6 +177,11 @@ class Graph extends React.Component {
     d3.selectAll("svg text").each(function(d) {
       d3.select(this).text(d.name);
     });
+
+    d3.selectAll("g.connector").classed(
+      "selected",
+      d => d.key === this.props.selectedKey
+    );
   };
 
   updateNode = selection => {
@@ -172,7 +198,12 @@ class Graph extends React.Component {
   };
 
   enterLink = selection => {
+    const graph = this;
+
+    selection.classed("connector", true);
+    // add a visible line with an arrow
     selection
+      .append("line")
       .classed("link", true)
       .attr("stroke-width", d => d.size)
       .attr("marker-end", d => {
@@ -183,6 +214,27 @@ class Graph extends React.Component {
         if (this.props.thumbNail) return null;
         return d.left || (!d.left && !d.right) ? `url(#start--20)` : null;
       });
+
+    // add an invisible wide path to make it easier to mouseover
+    selection
+      .append("path")
+      .classed("hittarget", true)
+      .on("click", function(d) {
+        d3.select(this.parentNode).classed("selected", true);
+        graph.notifyCurrentConnector(d);
+        graph.refresh();
+      })
+      .on("mouseover", function(n) {
+        d3.select(this.parentNode).classed("over", true);
+      })
+      .on("mouseout", function(n) {
+        d3.select(this.parentNode).classed("over", false);
+      });
+    this.refresh();
+  };
+
+  notifyCurrentConnector = d => {
+    if (this.props.notifyCurrentConnector) this.props.notifyCurrentConnector(d);
   };
 
   updateLink = selection => {
@@ -193,14 +245,34 @@ class Graph extends React.Component {
       .attr("y2", d => d.target.y);
   };
 
+  updatePath = selection => {
+    selection.attr(
+      "d",
+      d => `M${d.source.x},${d.source.y}L${d.target.x},${d.target.y}`
+    );
+  };
+
   updateGraph = selection => {
     selection.selectAll(".node").call(this.updateNode);
     selection.selectAll(".link").call(this.updateLink);
+    selection.selectAll(".hittarget").call(this.updatePath);
+  };
+
+  cloudBackground = () => {
+    if (!this.props.thumbNail) {
+      return (
+        <g transform={`scale(12, 8)`}>
+          <path
+            className="cloud-outline"
+            d="m 10,20 C 5,10 10,5 20,10 C 25,0 35,0 40,10 C 45,0 60,0 65,10 C 70,0 85,0 90,10 C 100,5 105,10 100,20 C 110,25 110,35 100,40 C 110,45 110,55 100,60 C 105,70 100,75 90,70 C 85,80 75,80 70,70 C 65,80 50,80 45,70 C 40,80 25,80 20,70 C 10,75 5,70 10,60 C 0,55 0,45 10,40 C 0,35 0,25 10,20 z"
+          />
+        </g>
+      );
+    }
   };
 
   render() {
     const { width, height } = this.props.dimensions;
-    const cloudXScale = this.props.thumbNail ? 0 : 13;
     return (
       <React.Fragment>
         <svg
@@ -209,12 +281,7 @@ class Graph extends React.Component {
           ref={el => (this.svg = el)}
           xmlns="http://www.w3.org/2000/svg"
         >
-          <g transform={`scale(${cloudXScale}, 8)`}>
-            <path
-              className="cloud-outline"
-              d="m 10,20 C 5,10 10,5 20,10 C 25,0 35,0 40,10 C 45,0 60,0 65,10 C 70,0 85,0 90,10 C 100,5 105,10 100,20 C 110,25 110,35 100,40 C 110,45 110,55 100,60 C 105,70 100,75 90,70 C 85,80 75,80 70,70 C 65,80 50,80 45,70 C 40,80 25,80 20,70 C 10,75 5,70 10,60 C 0,55 0,45 10,40 C 0,35 0,25 10,20 z"
-            />
-          </g>
+          {this.cloudBackground()}
           <g ref={el => (this.svgg = el)} />
         </svg>
       </React.Fragment>

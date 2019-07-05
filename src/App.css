@@ -85,13 +85,19 @@
   height: 800px;
 }
 
+.node.interior path {
+  fill: green;
+  stroke-width: 1;
+  stroke: green;
+}
+
 .node circle {
   fill: #fff;
   stroke: #000;
   stroke-width: 2px;
 }
 
-.node.selected circle {
+.node.selected circle, .node.edgeClass.selected circle {
   stroke-width: 4px;
   stroke: green;
   fill: #EAEAEA;
@@ -103,9 +109,23 @@
   font-size: .8em;
 }
 
+g.over line {
+  stroke: #000;
+  stroke-width: 4;
+}
+
+g.selected line {
+  stroke: green;
+  stroke-width: 4;
+}
+
 .link {
   stroke: #000;
-  stroke-opacity: .6;
+}
+
+path.hittarget {
+  stroke-width: 15px;
+  stroke: transparent;
 }
 
 .node.client rect {
@@ -113,11 +133,11 @@
   fill: white;
 }
 
-.node.edgeClass polygon {
+.node.edgeClass circle {
   stroke: black;
-  fill: none;
-  stroke-width: 0.02;
-  stroke-dasharray: 0.2;
+  fill: white;
+  stroke-width: 2;
+  stroke-dasharray: 4;
 }
 
 .tag-line {

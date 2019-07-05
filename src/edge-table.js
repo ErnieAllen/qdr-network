@@ -8,6 +8,7 @@ import {
 } from "@patternfly/react-table";
 import EdgeTableToolbar from "./edge-table-toolbar";
 import EdgeTablePagination from "./edge-table-pagination";
+import EmptyEdgeClassTable from "./empty-edge-class-table";
 
 class EdgeTable extends React.Component {
   constructor(props) {
@@ -36,27 +37,33 @@ class EdgeTable extends React.Component {
     this.props.handleSelectEdgeRow(rowId, isSelected);
   };
 
-  render() {
+  genTable = () => {
     const { columns } = this.state;
-    return (
-      <React.Fragment>
-        <label>Edge connectors</label>
-        <EdgeTableToolbar
-          handleAddEdge={this.props.handleAddEdge}
-          handleDeleteEdge={this.props.handleDeleteEdge}
-        />
-        <Table
-          variant={TableVariant.compact}
-          onSelect={this.onSelect}
-          cells={columns}
-          rows={this.props.rows}
-        >
-          <TableHeader />
-          <TableBody />
-        </Table>
-        <EdgeTablePagination />
-      </React.Fragment>
-    );
+    if (this.props.rows.length > 0) {
+      return (
+        <React.Fragment>
+          <label>Edge routers</label>
+          <EdgeTableToolbar
+            handleAddEdge={this.props.handleAddEdge}
+            handleDeleteEdge={this.props.handleDeleteEdge}
+          />
+          <Table
+            variant={TableVariant.compact}
+            onSelect={this.onSelect}
+            cells={columns}
+            rows={this.props.rows}
+          >
+            <TableHeader />
+            <TableBody />
+          </Table>
+          <EdgeTablePagination />
+        </React.Fragment>
+      );
+    }
+    return <EmptyEdgeClassTable handleAddEdge={this.props.handleAddEdge} />;
+  };
+  render() {
+    return <React.Fragment>{this.genTable()}</React.Fragment>;
   }
 }
 

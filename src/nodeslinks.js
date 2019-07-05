@@ -7,7 +7,7 @@ class NodesLinks {
     target: t,
     key: `link-${i}`,
     size: 2,
-    type: "router",
+    type: "connector",
     left: true,
     right: false
   });
@@ -58,13 +58,14 @@ class NodesLinks {
     const newNode = this.node(i, x, y);
     newNode.type = type;
     if (type === "interior") {
-      newNode.name = `R${i}`;
+      newNode.Name = `R${i}`;
       newNode.suffix = "";
       newNode.namespace = "";
+      newNode.state = 0;
     } else if (type === "edgeClass") {
       newNode.name = `EC${i}`;
       newNode.rows = [];
-      newNode.r = 6;
+      newNode.r = 60;
     }
     networkInfo.nodes.push(newNode);
   };

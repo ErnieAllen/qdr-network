@@ -1,14 +1,13 @@
 import React from "react";
 import {
-  Checkbox,
   Form,
   FormGroup,
   TextInput,
-  ActionGroup,
   Button,
   Radio
 } from "@patternfly/react-core";
 import EdgeTable from "./edge-table";
+import Graph from "./graph";
 
 class FieldDetails extends React.Component {
   constructor(props) {
@@ -33,28 +32,54 @@ class FieldDetails extends React.Component {
       );
     }
     if (field.type === "radio") {
+      const currentNode = this.props.networkInfo.nodes.find(
+        n => n.key === this.props.selectedKey
+      );
       return field.options.map((o, i) => {
         return (
           <Radio
             key={`key-radio-${o}-${i}`}
-            id={`${field.title}-${i}`}
+            id={o}
+            value={o}
             name={field.title}
             label={o}
             aria-label={o}
+            onChange={() => this.props.handleRadioChange(o, field.title)}
+            isChecked={currentNode[field.title] === o}
           />
         );
       });
     }
-    if (field.type === "checkbox") {
+    if (field.type === "states") {
       return field.options.map((o, i) => {
         return (
-          <Checkbox
+          <div
+            className="pf-c-check"
             key={`key-checkbox-${o}-${i}`}
             id={`${field.title}-${i}`}
-            name={field.title}
-            label={o}
-            aria-label={o}
-          />
+          >
+            <label className="pf-c-check__label" htmlFor={`State-${i}`}>
+              <span>
+                <Graph
+                  id={`State-${i}`}
+                  thumbNail={true}
+                  legend={true}
+                  dimensions={{ width: 30, height: 30 }}
+                  nodes={[
+                    {
+                      key: `legend-key-${i}`,
+                      r: 10,
+                      type: "interior",
+                      state: i
+                    }
+                  ]}
+                  links={[]}
+                  notifyCurrentRouter={() => {}}
+                />
+                {o}
+              </span>
+            </label>
+          </div>
         );
       });
     }
@@ -84,6 +109,19 @@ class FieldDetails extends React.Component {
     return (
       <Form>
         <h1>{this.props.details.title}</h1>
+        <FormGroup fieldId="actions">
+          {this.props.details.actions.map(action => {
+            return (
+              <Button
+                key={action.title}
+                variant="secondary"
+                onClick={action.onClick}
+              >
+                {action.title}
+              </Button>
+            );
+          })}
+        </FormGroup>
         {this.props.details.fields.map(field => {
           return (
             <FormGroup
@@ -98,19 +136,6 @@ class FieldDetails extends React.Component {
             </FormGroup>
           );
         })}
-        <ActionGroup>
-          {this.props.details.actions.map(action => {
-            return (
-              <Button
-                key={action.title}
-                variant="secondary"
-                onClick={action.onClick}
-              >
-                {action.title}
-              </Button>
-            );
-          })}
-        </ActionGroup>
         <FormGroup fieldId="extra">{this.extra(currentNode)}</FormGroup>
       </Form>
     );

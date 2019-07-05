@@ -138,6 +138,15 @@ class ChooseTopology extends React.Component {
     }
   };
 
+  handleRadioChange = (o, title) => {
+    const { networkInfo, selectedKey } = this.state;
+    const currentNode = networkInfo.nodes.find(n => n.key === selectedKey);
+    if (currentNode) {
+      currentNode[title] = o;
+    }
+    this.setState({ networkInfo });
+  };
+
   updateNodesLinks = networkInfo => {
     const { nodes, links } = this.nodesLinks.setNodesLinks(
       networkInfo,
@@ -160,6 +169,11 @@ class ChooseTopology extends React.Component {
   };
 
   notifyCurrentRouter = selectedKey => {
+    this.setState({ selectedKey });
+  };
+
+  notifyCurrentConnector = d => {
+    const selectedKey = d.key;
     this.setState({ selectedKey });
   };
 
@@ -202,7 +216,7 @@ class ChooseTopology extends React.Component {
                   onClick={this.handleAddInterior}
                   variant="tertiary"
                 >
-                  Add Interior Connector
+                  Add Cluster Connector
                 </Button>
               </ToolbarItem>
               <ToolbarItem className="pf-u-mx-md">
@@ -227,6 +241,7 @@ class ChooseTopology extends React.Component {
                     links={this.state.networkInfo.links}
                     dimensions={this.state.dimensions}
                     notifyCurrentRouter={this.notifyCurrentRouter}
+                    notifyCurrentConnector={this.notifyCurrentConnector}
                     notifyCreateLink={this.notifyCreateLink}
                     selectedKey={this.state.selectedKey}
                   />
@@ -243,6 +258,7 @@ class ChooseTopology extends React.Component {
                 handleDeleteEdge={this.handleDeleteEdge}
                 handleEdgeNameChange={this.handleEdgeNameChange}
                 handleSelectEdgeRow={this.handleSelectEdgeRow}
+                handleRadioChange={this.handleRadioChange}
               />
             </SplitItem>
           </Split>
