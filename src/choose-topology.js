@@ -14,8 +14,8 @@ import {} from "@patternfly/react-core";
 
 import Graph from "./graph";
 import NetworkName from "./network-name";
-import NodesLinks from "./nodeslinks";
 import TopologyContext from "./topology-context";
+import NodesLinks from "./nodeslinks";
 
 class ChooseTopology extends React.Component {
   constructor(props) {
