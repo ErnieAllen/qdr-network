@@ -80,7 +80,6 @@
 }
 
 .force-graph {
-  width: 100%;
   min-height: 480px;
   height: 800px;
 }
@@ -225,4 +224,13 @@ path.cloud-outline {
 .edge-table-actions {
   position: absolute;
   right: 1em;
+}
+
+.empty-selection {
+  max-width: 30em;
+}
+
+.link-label {
+  margin-left: 1em;
+  font-weight: bold;
 }

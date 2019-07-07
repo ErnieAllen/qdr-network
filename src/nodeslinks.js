@@ -21,7 +21,6 @@ class NodesLinks {
 
   node = (i, x, y) => ({
     key: `key_${i}`,
-    name: `R${i}`,
     val: i,
     size: 15,
     r: 20,
@@ -59,21 +58,32 @@ class NodesLinks {
     newNode.type = type;
     if (type === "interior") {
       newNode.Name = `R${i}`;
-      newNode.suffix = "";
-      newNode.namespace = "";
+      newNode["Route-suffix"] = "";
+      newNode.Namespace = "";
       newNode.state = 0;
     } else if (type === "edgeClass") {
-      newNode.name = `EC${i}`;
+      newNode.Name = `EC${i}`;
       newNode.rows = [];
       newNode.r = 60;
     }
     networkInfo.nodes.push(newNode);
   };
 
-  addLink = (toIndex, fromIndex, links) => {
+  addLink = (toIndex, fromIndex, links, nodes) => {
     if (!this.linkBetween(links, toIndex, fromIndex)) {
       const link = this.link(fromIndex, toIndex, NodesLinks.nextLinkIndex++);
+      if (
+        nodes[toIndex].type === "interior" &&
+        nodes[fromIndex].type === "interior"
+      ) {
+        link["connector type"] = "inter-router";
+      } else {
+        link["connector type"] = "edge";
+      }
+      link.connector = () => nodes[toIndex].Name;
+      link.listener = () => nodes[fromIndex].Name;
       links.push(link);
+      return link;
     }
   };
 

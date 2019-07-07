@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  Button,
   FormGroup,
   Text,
   TextContent,
@@ -45,7 +44,6 @@ class NetworkName extends React.Component {
             </TextContent>
           </SplitItem>
           <SplitItem isFilled>
-            {" "}
             <FormGroup label="" isRequired fieldId="simple-form-name">
               <TextInput
                 className={this.state.editing ? "editing" : "not-editing"}
@@ -59,25 +57,6 @@ class NetworkName extends React.Component {
                 onChange={this.handleLocalEditName}
               />
             </FormGroup>
-          </SplitItem>
-          <SplitItem>
-            <Button
-              onClick={this.handleSaveClick}
-              variant={this.state.editing ? "primary" : "tertiary"}
-            >
-              {this.state.editing ? "Save" : "Edit"}
-            </Button>
-          </SplitItem>
-          <SplitItem>
-            <Button
-              onClick={this.handleCancelClick}
-              variant="secondary"
-              className={
-                this.state.editing ? "editing-cancel" : "not-editing-cancel"
-              }
-            >
-              Cancel
-            </Button>
           </SplitItem>
         </Split>
       </React.Fragment>

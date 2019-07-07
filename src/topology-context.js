@@ -13,8 +13,8 @@ class TopologyContext extends React.Component {
         title: "Cluster connector",
         fields: [
           { title: "Name", type: "text", isRequired: true },
-          { title: "Route-suffix", type: "text" },
-          { title: "Namespace", type: "text" },
+          { title: "Route-suffix", type: "text", isRequired: this.isRequired },
+          { title: "Namespace", type: "text", isRequired: this.isRequired },
           {
             title: "Cluster type",
             type: "radio",
@@ -30,30 +30,50 @@ class TopologyContext extends React.Component {
       },
       edgeClass: {
         title: "Edge class",
-        fields: [{ title: "name", type: "text", isRequired: true }],
+        fields: [{ title: "Name", type: "text", isRequired: true }],
         actions: [{ title: "Delete", onClick: this.props.handleDeleteRouter }],
         extra: { title: "Edge routers", type: "edgeTable" }
       },
       edge: {
         title: "Edge router",
-        fields: [{ title: "name", type: "text", isRequired: true }],
+        fields: [{ title: "Name", type: "text", isRequired: true }],
         actions: [{ title: "Delete", onClick: this.props.handleDeleteRouter }]
       },
       connector: {
         title: "Connection",
-        fields: [],
+        fields: [
+          { title: "connector type", type: "label" },
+          { title: "connector", type: "label" },
+          { title: "listener", type: "label" }
+        ],
         actions: [
-          { title: "Delete", onClick: this.handleDeleteConnection },
-          { title: "Reverse", onClick: this.handleReverseConnections }
+          { title: "Delete", onClick: this.props.handleDeleteConnection },
+          {
+            title: "Reverse",
+            onClick: this.props.handleReverseConnection,
+            isDisabled: this.isActionDisabled
+          }
         ]
       }
     };
   }
 
-  handleDeleteEdgeClass = () => {};
-  handleDeleteEdge = () => {};
-  handleDeleteConnection = () => {};
-  handleReverseConnection = () => {};
+  isActionDisabled = (title, networkInfo, selectedKey) => {
+    if (title === "Reverse") {
+      const currentLink = networkInfo.links.find(l => l.key === selectedKey);
+      if (currentLink) {
+        if (currentLink["connector type"] === "edge") return true;
+      }
+    }
+    return false;
+  };
+
+  isRequired = (title, networkInfo, selectedKey) => {
+    // if there are any links going to this node, suffix and namespace are required
+    if (title === "Route-suffix" || title === "Namespace")
+      return networkInfo.links.some(l => l.source.key === selectedKey);
+    return false;
+  };
 
   render() {
     let currentContext = null;

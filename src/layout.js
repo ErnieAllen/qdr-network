@@ -75,32 +75,6 @@ class PageLayoutDefaultNav extends React.Component {
     });
   };
 
-  // user clicked on a topology card, or changed the topology dropdown
-  handleChooseTopology = x => {
-    // change the page and set the topology
-    this.setState({
-      activeItem: 1,
-      chosenTopology: x.toLowerCase()
-    });
-  };
-
-  handleAddAddress = name => {
-    const { allAddresses } = this.state;
-    if (allAddresses.indexOf(name) < 0) {
-      allAddresses.push(name);
-      this.setState({ allAddresses });
-    }
-  };
-
-  handleDelAddress = name => {
-    const { allAddresses } = this.state;
-    const index = allAddresses.indexOf(name);
-    if (index >= 0) {
-      allAddresses.splice(index, 1);
-      this.setState({ allAddresses });
-    }
-  };
-
   render() {
     const { isDropdownOpen, isKebabDropdownOpen } = this.state;
 
@@ -221,10 +195,7 @@ class PageLayoutDefaultNav extends React.Component {
     return (
       <React.Fragment>
         <Page header={Header} skipToContent={PageSkipToContent}>
-          <ChooseTopology
-            handleChooseTopology={this.handleChooseTopology}
-            topologies={this.topologies}
-          />
+          <ChooseTopology />
         </Page>
       </React.Fragment>
     );

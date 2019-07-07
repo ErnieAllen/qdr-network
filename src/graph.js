@@ -57,11 +57,12 @@ class Graph extends React.Component {
     d3Nodes.call(this.force.drag);
 
     const d3Links = this.d3Graph
-      .selectAll(".link")
+      .selectAll(".connector")
       .data(nextProps.links, link => link.key);
     d3Links
       .enter()
       .insert("g", ".node")
+      .classed("connector", true)
       .call(this.enterLink);
     d3Links.exit().remove();
     d3Links.call(this.updateLink);
@@ -72,7 +73,7 @@ class Graph extends React.Component {
     // mutates the nodes and links array directly
     this.force.nodes(nextProps.nodes).links(nextProps.links);
     this.force.start();
-
+    if (nextProps) this.refresh(nextProps);
     return false;
   }
 
@@ -106,10 +107,15 @@ class Graph extends React.Component {
         .append("text")
         .attr("x", d => d.r + 5)
         .attr("dy", ".35em")
-        .text(d => d.name);
+        .text(d => d.Name);
+      selection
+        .append("text")
+        .classed("edge-count", true)
+        .attr("x", -24)
+        .attr("dy", "0.35em")
+        .text("");
     }
-
-    /*
+    /* // this creates an octagon
     const sqr2o2 = Math.sqrt(2.0) / 2.0;
     const points = `1 0 ${sqr2o2} ${sqr2o2} 0 1 -${sqr2o2} ${sqr2o2} -1 0 -${sqr2o2} -${sqr2o2} 0 -1 ${sqr2o2} -${sqr2o2}`;
     selection
@@ -147,7 +153,7 @@ class Graph extends React.Component {
         } else {
           graph.props.notifyCurrentRouter(n.key);
         }
-        graph.refresh();
+        graph.refresh(graph.props);
       })
       .on("mousedown", function(n) {
         graph.mouse_down_position = d3.mouse(this.parentNode);
@@ -157,7 +163,7 @@ class Graph extends React.Component {
         if (n.type !== "edge") n.fixed = true;
       });
 
-    this.refresh();
+    this.refresh(this.props);
   };
 
   samePos = (pos1, pos2) => {
@@ -166,22 +172,25 @@ class Graph extends React.Component {
     }
     return false;
   };
-  refresh = () => {
+
+  refresh = props => {
     const circles = d3.selectAll("g.node.network");
     circles
-      .classed("selected", d => d.key === this.props.selectedKey)
+      .classed("selected", d => d.key === props.selectedKey)
       .classed("edgeClass", d => d.type === "edgeClass")
       .classed("edge", d => d.type === "edge")
       .classed("interior", d => d.type === "interior");
 
     d3.selectAll("svg text").each(function(d) {
-      d3.select(this).text(d.name);
+      d3.select(this).text(d.Name);
     });
-
     d3.selectAll("g.connector").classed(
       "selected",
-      d => d.key === this.props.selectedKey
+      d => d.key === props.selectedKey
     );
+    d3.selectAll("text.edge-count").text(d => {
+      return d.rows.length > 0 ? `Edges: ${d.rows.length}` : "";
+    });
   };
 
   updateNode = selection => {
@@ -222,7 +231,7 @@ class Graph extends React.Component {
       .on("click", function(d) {
         d3.select(this.parentNode).classed("selected", true);
         graph.notifyCurrentConnector(d);
-        graph.refresh();
+        graph.refresh(graph.props);
       })
       .on("mouseover", function(n) {
         d3.select(this.parentNode).classed("over", true);
@@ -230,7 +239,7 @@ class Graph extends React.Component {
       .on("mouseout", function(n) {
         d3.select(this.parentNode).classed("over", false);
       });
-    this.refresh();
+    this.refresh(this.props);
   };
 
   notifyCurrentConnector = d => {

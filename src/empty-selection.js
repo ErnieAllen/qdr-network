@@ -16,7 +16,7 @@ class EmptySelection extends React.Component {
 
   render() {
     return (
-      <EmptyState variant={EmptyStateVariant.small}>
+      <EmptyState variant={EmptyStateVariant.small} className="empty-selection">
         <EmptyStateIcon icon={CubesIcon} />
         <Title headingLevel="h5" size="lg">
           Nothing selected

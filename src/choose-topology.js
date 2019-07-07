@@ -147,6 +147,30 @@ class ChooseTopology extends React.Component {
     this.setState({ networkInfo });
   };
 
+  handleDeleteConnection = () => {
+    const { networkInfo, selectedKey } = this.state;
+    const currentLinkIndex = networkInfo.links.findIndex(
+      l => l.key === selectedKey
+    );
+    if (currentLinkIndex >= 0) {
+      networkInfo.links.splice(currentLinkIndex, 1);
+    }
+    this.setState({ networkInfo });
+  };
+
+  handleReverseConnection = () => {
+    const { networkInfo } = this.state;
+    let { selectedKey } = this.state;
+    const currentLink = networkInfo.links.find(l => l.key === selectedKey);
+    const to = currentLink.target.key;
+    const from = currentLink.source.key;
+
+    this.handleDeleteConnection();
+    const newLink = this.notifyCreateLink(to, from);
+    selectedKey = newLink.key;
+    this.setState({ selectedKey });
+  };
+
   updateNodesLinks = networkInfo => {
     const { nodes, links } = this.nodesLinks.setNodesLinks(
       networkInfo,
@@ -179,15 +203,26 @@ class ChooseTopology extends React.Component {
 
   notifyCreateLink = (to, from) => {
     const { networkInfo } = this.state;
-    const toIndex = networkInfo.nodes.findIndex(n => n.key === to);
-    const fromIndex = networkInfo.nodes.findIndex(n => n.key === from);
+    let toIndex = networkInfo.nodes.findIndex(n => n.key === to);
+    let fromIndex = networkInfo.nodes.findIndex(n => n.key === from);
     if (toIndex >= 0 && fromIndex >= 0) {
       if (
-        networkInfo.nodes[toIndex].type === "interior" &&
-        networkInfo.nodes[fromIndex].type !== "edge"
+        networkInfo.nodes[toIndex].type === "edgeClass" &&
+        networkInfo.nodes[fromIndex].type === "interior"
       ) {
-        this.nodesLinks.addLink(fromIndex, toIndex, networkInfo.links);
+        const tmp = toIndex;
+        toIndex = fromIndex;
+        fromIndex = tmp;
+      }
+      if (networkInfo.nodes[toIndex].type === "interior") {
+        const newLink = this.nodesLinks.addLink(
+          fromIndex,
+          toIndex,
+          networkInfo.links,
+          networkInfo.nodes
+        );
         this.setState({ networkInfo });
+        return newLink;
       }
     }
   };
@@ -259,6 +294,8 @@ class ChooseTopology extends React.Component {
                 handleEdgeNameChange={this.handleEdgeNameChange}
                 handleSelectEdgeRow={this.handleSelectEdgeRow}
                 handleRadioChange={this.handleRadioChange}
+                handleDeleteConnection={this.handleDeleteConnection}
+                handleReverseConnection={this.handleReverseConnection}
               />
             </SplitItem>
           </Split>

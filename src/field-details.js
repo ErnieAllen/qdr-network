@@ -1,9 +1,10 @@
 import React from "react";
 import {
+  ActionGroup,
+  Button,
   Form,
   FormGroup,
   TextInput,
-  Button,
   Radio
 } from "@patternfly/react-core";
 import EdgeTable from "./edge-table";
@@ -17,9 +18,16 @@ class FieldDetails extends React.Component {
 
   formElement = (field, currentNode) => {
     if (field.type === "text") {
+      let isRequired = field.isRequired;
+      if (typeof field.isRequired === "function")
+        isRequired = field.isRequired(
+          field.title,
+          this.props.networkInfo,
+          this.props.selectedKey
+        );
       return (
         <TextInput
-          isRequired={field.isRequired}
+          isRequired={isRequired}
           type="text"
           id={field.title}
           name={field.title}
@@ -49,8 +57,7 @@ class FieldDetails extends React.Component {
           />
         );
       });
-    }
-    if (field.type === "states") {
+    } else if (field.type === "states") {
       return field.options.map((o, i) => {
         return (
           <div
@@ -58,30 +65,37 @@ class FieldDetails extends React.Component {
             key={`key-checkbox-${o}-${i}`}
             id={`${field.title}-${i}`}
           >
-            <label className="pf-c-check__label" htmlFor={`State-${i}`}>
-              <span>
-                <Graph
-                  id={`State-${i}`}
-                  thumbNail={true}
-                  legend={true}
-                  dimensions={{ width: 30, height: 30 }}
-                  nodes={[
-                    {
-                      key: `legend-key-${i}`,
-                      r: 10,
-                      type: "interior",
-                      state: i
-                    }
-                  ]}
-                  links={[]}
-                  notifyCurrentRouter={() => {}}
-                />
-                {o}
-              </span>
-            </label>
+            <Graph
+              id={`State-${i}`}
+              thumbNail={true}
+              legend={true}
+              dimensions={{ width: 30, height: 30 }}
+              nodes={[
+                {
+                  key: `legend-key-${i}`,
+                  r: 10,
+                  type: "interior",
+                  state: i
+                }
+              ]}
+              links={[]}
+              notifyCurrentRouter={() => {}}
+            />
+            {o}
           </div>
         );
       });
+    } else if (field.type === "label") {
+      const currentLink = this.props.networkInfo.links.find(
+        n => n.key === this.props.selectedKey
+      );
+      return (
+        <span className="link-label">
+          {typeof currentLink[field.title] === "function"
+            ? currentLink[field.title]()
+            : currentLink[field.title]}
+        </span>
+      );
     }
   };
 
@@ -107,27 +121,49 @@ class FieldDetails extends React.Component {
       n => n.key === this.props.selectedKey
     );
     return (
-      <Form>
+      <Form
+        onSubmit={e => {
+          e.preventDefault();
+          return false;
+        }}
+      >
         <h1>{this.props.details.title}</h1>
-        <FormGroup fieldId="actions">
+        <ActionGroup>
           {this.props.details.actions.map(action => {
             return (
               <Button
                 key={action.title}
                 variant="secondary"
                 onClick={action.onClick}
+                isDisabled={
+                  action.isDisabled
+                    ? action.isDisabled(
+                        action.title,
+                        this.props.networkInfo,
+                        this.props.selectedKey
+                      )
+                    : false
+                }
               >
                 {action.title}
               </Button>
             );
           })}
-        </FormGroup>
+        </ActionGroup>
         {this.props.details.fields.map(field => {
           return (
             <FormGroup
               key={field.title}
               label={field.title}
-              isRequired={field.isRequired}
+              isRequired={
+                typeof field.isRequired === "function"
+                  ? field.isRequired(
+                      field.title,
+                      this.props.networkInfo,
+                      this.props.selectedKey
+                    )
+                  : field.isRequired
+              }
               fieldId={field.title}
               helperText={field.help}
               isInline={field.type === "radio"}
