@@ -234,3 +234,9 @@ path.cloud-outline {
   margin-left: 1em;
   font-weight: bold;
 }
+
+.logo-text {
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+}

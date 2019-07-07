@@ -5,8 +5,6 @@ import {
   PageSectionVariants,
   Split,
   SplitItem,
-  TextContent,
-  Text,
   Toolbar,
   ToolbarGroup,
   ToolbarItem
@@ -231,12 +229,6 @@ class ChooseTopology extends React.Component {
     return (
       <React.Fragment>
         <PageSection variant={PageSectionVariants.light}>
-          <TextContent>
-            <Text component="h1">Welcome to network creator</Text>
-            <Text component="p" className="tag-line">
-              Create a router network, add routers and edges, deploy!
-            </Text>
-          </TextContent>
           <NetworkName
             handleNetworkNameChange={this.handleNetworkNameChange}
             networkInfo={this.state.networkInfo}

@@ -170,16 +170,19 @@ class PageLayoutDefaultNav extends React.Component {
       <PageHeader
         className="topology-header"
         logo={
-          <ShowD3SVG
-            className="topology-logo"
-            topology="ted"
-            routers={6}
-            center={false}
-            dimensions={{ width: 150, height: 75 }}
-            radius={6}
-            thumbNail={true}
-            notifyCurrentRouter={() => {}}
-          />
+          <React.Fragment>
+            <ShowD3SVG
+              className="topology-logo"
+              topology="ted"
+              routers={6}
+              center={false}
+              dimensions={{ width: 150, height: 75 }}
+              radius={6}
+              thumbNail={true}
+              notifyCurrentRouter={() => {}}
+            />
+            <span className="logo-text">Network creator</span>
+          </React.Fragment>
         }
         toolbar={PageToolbar}
         avatar={<Avatar src={avatarImg} alt="Avatar image" />}

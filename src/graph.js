@@ -109,6 +109,7 @@ class Graph extends React.Component {
         .attr("dy", ".35em")
         .text(d => d.Name);
       selection
+        .filter(d => d.type === "edgeClass")
         .append("text")
         .classed("edge-count", true)
         .attr("x", -24)
