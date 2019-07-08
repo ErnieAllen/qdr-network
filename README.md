@@ -1,3 +1,11 @@
+If you have yarn installed, please use these commands to initialize and start the app:
+```
+$ yarn install
+$ yarn start
+```
+
+Otherwise, you can use the npm commands below.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

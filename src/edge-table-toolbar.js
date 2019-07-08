@@ -2,17 +2,17 @@ import React from "react";
 import {
   Button,
   ButtonVariant,
-  Dropdown,
-  DropdownPosition,
-  DropdownItem,
   InputGroup,
-  KebabToggle,
   TextInput,
   Toolbar,
   ToolbarGroup,
   ToolbarItem
 } from "@patternfly/react-core";
-import { SearchIcon, SortAlphaDownIcon } from "@patternfly/react-icons";
+import {
+  SearchIcon,
+  SortAlphaDownIcon,
+  SortAlphaUpIcon
+} from "@patternfly/react-icons";
 
 class EdgeTableToolbar extends React.Component {
   constructor(props) {
@@ -22,8 +22,8 @@ class EdgeTableToolbar extends React.Component {
       isKebabOpen: false,
       searchValue: ""
     };
-    this.handleTextInputChange = value => {
-      this.setState({ searchValue: value });
+    this.handleTextInputChange = searchValue => {
+      this.setState({ searchValue });
     };
 
     this.onDropDownToggle = isOpen => {
@@ -51,13 +51,12 @@ class EdgeTableToolbar extends React.Component {
     };
 
     this.buildSearchBox = () => {
-      let { value } = this.state.searchValue;
       return (
         <InputGroup>
           <TextInput
-            value={value ? value : ""}
+            value={this.props.filterText}
             type="search"
-            onChange={this.handleTextInputChange}
+            onChange={this.props.handleChangeFilter}
             aria-label="search text input"
             placeholder="search for edge routers"
           />
@@ -70,32 +69,6 @@ class EdgeTableToolbar extends React.Component {
         </InputGroup>
       );
     };
-
-    this.buildKebab = () => {
-      const { isKebabOpen } = this.state;
-
-      return (
-        <Dropdown
-          onSelect={this.onKebabSelect}
-          position={DropdownPosition.right}
-          toggle={<KebabToggle onToggle={this.onKebabToggle} />}
-          isOpen={isKebabOpen}
-          isPlain
-          dropdownItems={[
-            <DropdownItem key="link">Link</DropdownItem>,
-            <DropdownItem component="button" key="action_button">
-              Action
-            </DropdownItem>,
-            <DropdownItem isDisabled key="disabled_link">
-              Disabled Link
-            </DropdownItem>,
-            <DropdownItem isDisabled component="button" key="disabled_button">
-              Disabled Action
-            </DropdownItem>
-          ]}
-        />
-      );
-    };
   }
 
   render() {
@@ -106,8 +79,16 @@ class EdgeTableToolbar extends React.Component {
             {this.buildSearchBox()}
           </ToolbarItem>
           <ToolbarItem>
-            <Button variant="plain" aria-label="Sort A-Z">
-              <SortAlphaDownIcon />
+            <Button
+              variant="plain"
+              onClick={this.props.toggleAlphaSort}
+              aria-label="Sort A-Z"
+            >
+              {this.props.sortDown ? (
+                <SortAlphaDownIcon />
+              ) : (
+                <SortAlphaUpIcon />
+              )}
             </Button>
           </ToolbarItem>
         </ToolbarGroup>

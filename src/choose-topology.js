@@ -48,15 +48,27 @@ class ChooseTopology extends React.Component {
   };
 
   handleAddInterior = () => {
-    const { networkInfo, dimensions, selectedKey } = this.state;
-    this.nodesLinks.addNode("interior", networkInfo, dimensions, selectedKey);
-    this.setState({ networkInfo });
+    const { networkInfo, dimensions } = this.state;
+    let { selectedKey } = this.state;
+    const newNode = this.nodesLinks.addNode(
+      "interior",
+      networkInfo,
+      dimensions
+    );
+    selectedKey = newNode.key;
+    this.setState({ selectedKey, networkInfo });
   };
 
   handleAddEdgeClass = () => {
-    const { networkInfo, dimensions, selectedKey } = this.state;
-    this.nodesLinks.addNode("edgeClass", networkInfo, dimensions, selectedKey);
-    this.setState({ networkInfo });
+    const { networkInfo, dimensions } = this.state;
+    let { selectedKey } = this.state;
+    const newNode = this.nodesLinks.addNode(
+      "edgeClass",
+      networkInfo,
+      dimensions
+    );
+    selectedKey = newNode.key;
+    this.setState({ networkInfo, selectedKey });
   };
 
   handleAddEdge = () => {
@@ -65,7 +77,8 @@ class ChooseTopology extends React.Component {
     if (currentNode && currentNode.type === "edgeClass") {
       currentNode.rows.push({
         cells: [this.nodesLinks.getEdgeName()],
-        selected: false
+        selected: false,
+        key: `edgeKey-${this.nodesLinks.getEdgeKey()}`
       });
     }
     this.setState({ networkInfo });

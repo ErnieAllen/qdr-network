@@ -50,7 +50,7 @@ class NodesLinks {
     }
   };
 
-  addNode = (type, networkInfo, dimensions, selectedKey) => {
+  addNode = (type, networkInfo, dimensions) => {
     const i = NodesLinks.nextNodeIndex++;
     const x = dimensions.width / 2;
     const y = dimensions.height / 2;
@@ -67,6 +67,7 @@ class NodesLinks {
       newNode.r = 60;
     }
     networkInfo.nodes.push(newNode);
+    return newNode;
   };
 
   addLink = (toIndex, fromIndex, links, nodes) => {
@@ -89,6 +90,9 @@ class NodesLinks {
 
   getEdgeName = () => {
     return `Edge-${NodesLinks.nextEdgeIndex++}`;
+  };
+  getEdgeKey = () => {
+    return NodesLinks.nextEdgeIndex;
   };
 
   // return true if there are any links between toIndex and fromIndex

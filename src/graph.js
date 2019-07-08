@@ -51,7 +51,7 @@ class Graph extends React.Component {
     d3Nodes
       .enter()
       .append("g")
-      .call(this.enterNode);
+      .call(selection => this.enterNode(selection, nextProps));
     d3Nodes.exit().remove();
     d3Nodes.call(this.updateNode);
     d3Nodes.call(this.force.drag);
@@ -77,9 +77,10 @@ class Graph extends React.Component {
     return false;
   }
 
-  enterNode = selection => {
+  // new node/nodes are present
+  // append all the stuff and set the attributes that don't change
+  enterNode = (selection, props) => {
     const graph = this;
-
     selection.append("circle").attr("r", d => {
       return d.r ? d.r : d.size;
     });
@@ -97,12 +98,16 @@ class Graph extends React.Component {
         })
       );
 
-    selection.classed("node", true);
+    selection
+      .classed("node", true)
+      .classed("edgeClass", d => d.type === "edgeClass")
+      .classed("edge", d => d.type === "edge")
+      .classed("interior", d => d.type === "interior");
 
-    if (!this.props.thumbNail || this.props.legend) {
+    if (!props.thumbNail || props.legend) {
       selection.classed("network", true);
     }
-    if (!this.props.thumbNail) {
+    if (!props.thumbNail) {
       selection
         .append("text")
         .attr("x", d => d.r + 5)
@@ -163,8 +168,6 @@ class Graph extends React.Component {
         if (graph.props.thumbNail) return;
         if (n.type !== "edge") n.fixed = true;
       });
-
-    this.refresh(this.props);
   };
 
   samePos = (pos1, pos2) => {
@@ -174,13 +177,12 @@ class Graph extends React.Component {
     return false;
   };
 
+  // called each time a property changes
+  // update the classes/text based on the new properties
   refresh = props => {
+    if (props.thumbNail) return;
     const circles = d3.selectAll("g.node.network");
-    circles
-      .classed("selected", d => d.key === props.selectedKey)
-      .classed("edgeClass", d => d.type === "edgeClass")
-      .classed("edge", d => d.type === "edge")
-      .classed("interior", d => d.type === "interior");
+    circles.classed("selected", d => d.key === props.selectedKey);
 
     d3.selectAll("svg text").each(function(d) {
       d3.select(this).text(d.Name);
@@ -194,6 +196,7 @@ class Graph extends React.Component {
     });
   };
 
+  // update the node's positions
   updateNode = selection => {
     selection.attr("transform", d => {
       let r = 15;
@@ -207,6 +210,8 @@ class Graph extends React.Component {
     return `--${end === "end" ? link.size : link.size}`;
   };
 
+  // called with a selection that represents all the new links between nodes
+  // here we add the lines and set their attributes
   enterLink = selection => {
     const graph = this;
 
@@ -247,6 +252,7 @@ class Graph extends React.Component {
     if (this.props.notifyCurrentConnector) this.props.notifyCurrentConnector(d);
   };
 
+  // update the link's positions
   updateLink = selection => {
     selection
       .attr("x1", d => d.source.x)
@@ -255,6 +261,7 @@ class Graph extends React.Component {
       .attr("y2", d => d.target.y);
   };
 
+  // update the hittarget for the links's positions
   updatePath = selection => {
     selection.attr(
       "d",
@@ -262,12 +269,14 @@ class Graph extends React.Component {
     );
   };
 
+  // called each animation tick to update the positions
   updateGraph = selection => {
     selection.selectAll(".node").call(this.updateNode);
     selection.selectAll(".link").call(this.updateLink);
     selection.selectAll(".hittarget").call(this.updatePath);
   };
 
+  // draw a background around the svg
   cloudBackground = () => {
     if (!this.props.thumbNail) {
       return (
