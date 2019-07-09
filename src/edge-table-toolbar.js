@@ -71,6 +71,8 @@ class EdgeTableToolbar extends React.Component {
     };
   }
 
+  isDeleteDisabled = () => this.props.rows.every(r => !r.selected);
+
   render() {
     return (
       <Toolbar className="pf-l-toolbar pf-u-justify-content-space-between pf-u-mx-xl pf-u-my-md">
@@ -94,7 +96,11 @@ class EdgeTableToolbar extends React.Component {
         </ToolbarGroup>
         <ToolbarGroup className="edge-table-actions">
           <ToolbarItem className="pf-u-mx-sm">
-            <Button aria-label="Delete" onClick={this.props.handleDeleteEdge}>
+            <Button
+              aria-label="Delete"
+              onClick={this.props.handleDeleteEdge}
+              isDisabled={this.isDeleteDisabled()}
+            >
               Delete
             </Button>
           </ToolbarItem>
