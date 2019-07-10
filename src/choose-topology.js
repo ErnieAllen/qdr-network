@@ -110,7 +110,8 @@ class ChooseTopology extends React.Component {
       if (rowId === -1) {
         currentNode.rows = currentNode.rows.map(r => ({
           cells: r.cells,
-          selected: isSelected
+          selected: isSelected,
+          key: r.key
         }));
       } else {
         currentNode.rows[rowId].selected = isSelected;

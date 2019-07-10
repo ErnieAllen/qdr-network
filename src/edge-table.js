@@ -1,5 +1,5 @@
 import React from "react";
-import { TextInput } from "@patternfly/react-core";
+import { Button, TextInput } from "@patternfly/react-core";
 import {
   Table,
   TableHeader,
@@ -16,27 +16,70 @@ class EdgeTable extends React.Component {
     this.state = {
       columns: [{ title: "Name", cellFormatters: [this.formatName] }],
       filterText: "",
-      sortDown: true
+      sortDown: true,
+      editingEdgeRow: -1
     };
   }
 
-  formatName = (value, _xtraInfo) => {
+  onSelect = (event, isSelected, rowId) => {
+    console.log(`onSelect rowId is ${rowId}`);
     // the internal rows array may be different from the props.rows array
-    const realRowIndex = this.props.rows.findIndex(
-      r => r.key === _xtraInfo.rowData.key
-    );
+    const realRowIndex =
+      rowId >= 0
+        ? this.props.rows.findIndex(r => r.key === this.rows[rowId].key)
+        : rowId;
+    this.props.handleSelectEdgeRow(realRowIndex, isSelected);
+  };
+
+  handleEdgeNameBlur = () => {
+    this.onSelect("", false, -1);
+    this.setState({ editingEdgeRow: -1 });
+  };
+
+  handleEdgeNameClick = rowIndex => {
+    console.log(`handleEdgeNameClick ${rowIndex}`);
+    this.onSelect("", true, rowIndex);
+    this.setState({ editingEdgeRow: rowIndex });
+  };
+
+  handleEdgeKeyPress = event => {
+    if (event.key === "Enter") {
+      this.handleEdgeNameBlur();
+    }
+  };
+
+  formatName = (value, _xtraInfo) => {
+    console.log(`formatName called with editing ${this.state.editingEdgeRow}`);
+    if (this.state.editingEdgeRow === _xtraInfo.rowIndex) {
+      // the internal rows array may be different from the props.rows array
+      const realRowIndex = this.props.rows.findIndex(
+        r => r.key === _xtraInfo.rowData.key
+      );
+      return (
+        <TextInput
+          value={this.props.rows[realRowIndex].cells[0]}
+          type="text"
+          autoFocus
+          onChange={val => this.props.handleEdgeNameChange(val, realRowIndex)}
+          onBlur={this.handleEdgeNameBlur}
+          onKeyPress={this.handleEdgeKeyPress}
+          aria-label="text input example"
+        />
+      );
+    }
     return (
-      <TextInput
-        value={this.props.rows[realRowIndex].cells[0]}
-        type="text"
-        onChange={val => this.props.handleEdgeNameChange(val, realRowIndex)}
-        aria-label="text input example"
-      />
+      <Button
+        variant="link"
+        isInline
+        onClick={() => this.handleEdgeNameClick(_xtraInfo.rowIndex)}
+      >
+        {this.props.rows[_xtraInfo.rowIndex].cells[0]}
+      </Button>
     );
   };
 
   onSelect = (event, isSelected, rowId) => {
-    console.log(rowId);
+    console.log(`onSelect rowId is ${rowId}`);
     // the internal rows array may be different from the props.rows array
     const realRowIndex =
       rowId >= 0
@@ -51,6 +94,7 @@ class EdgeTable extends React.Component {
 
   genTable = () => {
     console.log("regenning table");
+    console.log(this.props.rows);
     const { columns, filterText } = this.state;
     if (this.props.rows.length > 0) {
       this.rows = this.props.rows.map(r => ({
